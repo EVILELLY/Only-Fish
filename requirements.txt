@@ -1,0 +1,8 @@
+flask_sqlalchemy
+flask_mail
+werkzeug
+cryptography
+flask_sqlalchemy
+flask_mail
+werkzeug
+cryptography

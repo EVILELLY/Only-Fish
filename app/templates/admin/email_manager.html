@@ -1,0 +1,43 @@
+<h2>钓鱼邮件管理</h2>
+<form method="post" enctype="multipart/form-data" style="margin-bottom:20px;">
+  <fieldset style="border:1px solid #ccc;padding:10px;margin-bottom:10px;">
+    <legend>发件配置</legend>
+    SMTP服务器：<input type="text" name="smtp_server" value="{{ smtp_server }}" style="width:180px;">
+    端口：<input type="text" name="smtp_port" value="{{ smtp_port }}" style="width:60px;">
+    发件人邮箱：<input type="text" name="sender_email" value="{{ sender_email }}" style="width:180px;">
+    密码：<input type="password" name="sender_pass" value="{{ sender_pass }}" style="width:120px;">
+    <br>发件人名称：<input type="text" name="sender_name" value="{{ sender_name }}" style="width:180px;">
+    邮件主题：<input type="text" name="mail_subject" value="{{ mail_subject }}" style="width:220px;">
+    <button type="submit" name="action" value="save_config">保存配置</button>
+  </fieldset>
+  <fieldset style="border:1px solid #ccc;padding:10px;margin-bottom:10px;">
+    <legend>邮件模板</legend>
+    <select name="template_name" style="width:220px;">
+      {% for t in templates %}
+      <option value="{{ t }}" {% if t==template_name %}selected{% endif %}>{{ t }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" name="action" value="preview_template">预览</button>
+  </fieldset>
+  <fieldset style="border:1px solid #ccc;padding:10px;margin-bottom:10px;">
+    <legend>收信人管理</legend>
+  <textarea name="recipients" rows="4" style="width:400px;" placeholder="每行一个邮箱地址，例如：&#10;user1@example.com&#10;user2@example.com">{{ recipients }}</textarea>
+  <br>
+  <span style="color:#888;">或导入CSV：</span>
+  <input type="file" name="recipients_file">
+  <button type="submit" name="action" value="import_recipients">导入</button>
+  <button type="submit" name="action" value="clear_recipients" style="margin-left:10px;">清空</button>
+  </fieldset>
+  <button type="submit" name="action" value="send_mail" style="font-size:16px;padding:6px 18px;">一键发送钓鱼邮件</button>
+</form>
+
+{% if template_html %}
+<div style="border:1px solid #aaa;padding:10px;margin-top:20px;">
+  <h3>模板预览：</h3>
+  <div style="background:#fff;max-width:600px;overflow:auto;">{{ template_html|safe }}</div>
+</div>
+{% endif %}
+
+{% if send_result %}
+<div style="margin-top:20px;color:green;">{{ send_result }}</div>
+{% endif %}

