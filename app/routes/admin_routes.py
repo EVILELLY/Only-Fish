@@ -61,100 +61,82 @@ def create_admin_bp(url_prefix):
                         'template_name': template_name
                     }, f, ensure_ascii=False, indent=2)
                 flash('配置已保存')
-            if request.method == 'POST':
-                action = request.form.get('action')
-                logger.info(f'action: {action}')
-                if action == 'save_config':
-                    smtp_server = request.form.get('smtp_server','')
-                    smtp_port = request.form.get('smtp_port','')
-                    sender_email = request.form.get('sender_email','')
-                    sender_pass = request.form.get('sender_pass','')
-                    template_name = request.form.get('template_name','')
-                    with open(config_path, 'w', encoding='utf-8') as f:
-                        json.dump({
-                            'smtp_server': smtp_server,
-                            'smtp_port': int(smtp_port) if smtp_port else '',
-                            'sender_email': sender_email,
-                            'sender_pass': sender_pass,
-                            'template_name': template_name
-                        }, f, ensure_ascii=False, indent=2)
-                    flash('配置已保存')
-                elif action == 'preview_template':
-                    template_name = request.form.get('template_name','')
-                    with open(os.path.join(templates_dir, template_name), 'r', encoding='utf-8') as f:
-                        template_html = f.read()
-                elif action == 'import_recipients':
-                    logger.info('已进入import_recipients分支')
-                    # 支持文本框或文件导入，批量写入Employee表
-                    recipients = request.form.get('recipients','')
-                    logger.info(f'收到表单recipients内容: {recipients}')
-                    file = request.files.get('recipients_file')
-                    if file and file.filename:
-                        file_content = file.read().decode('utf-8')
-                        logger.info(f'收到文件内容: {file_content}')
-                        if file_content.strip():
-                            recipients = file_content
-                    emails = [x.strip() for x in recipients.splitlines() if x.strip()]
-                    logger.info(f'解析到emails: {emails}')
-                    # 只导入新邮箱，避免重复
-                    exist_emails = set(e.email for e in Employee.query.all())
-                    for email in emails:
-                        if email and email not in exist_emails:
-                            # name字段不能为空，取@前前缀或全邮箱
-                            name = email.split('@')[0] if '@' in email else email
-                            logger.info(f'即将写入: name={name}, email={email}')
-                            emp = Employee(name=name, email=email)
-                            db.session.add(emp)
-                            exist_emails.add(email)  # 立即加入已存在集合，防止本次重复
-                    try:
-                        db.session.commit()
-                        logger.info('db.session.commit()成功')
-                    except Exception as e:
-                        logger.error(f'db.session.commit()异常: {e}')
-                    flash('收信人已导入')
-                elif action == 'clear_recipients':
-                    Employee.query.delete()
+            elif action == 'preview_template':
+                template_name = request.form.get('template_name','')
+                with open(os.path.join(templates_dir, template_name), 'r', encoding='utf-8') as f:
+                    template_html = f.read()
+            elif action == 'import_recipients':
+                logger.info('已进入import_recipients分支')
+                # 支持文本框或文件导入，批量写入Employee表
+                recipients = request.form.get('recipients','')
+                logger.info(f'收到表单recipients内容: {recipients}')
+                file = request.files.get('recipients_file')
+                if file and file.filename:
+                    file_content = file.read().decode('utf-8')
+                    logger.info(f'收到文件内容: {file_content}')
+                    if file_content.strip():
+                        recipients = file_content
+                emails = [x.strip() for x in recipients.splitlines() if x.strip()]
+                logger.info(f'解析到emails: {emails}')
+                # 只导入新邮箱，避免重复
+                exist_emails = set(e.email for e in Employee.query.all())
+                for email in emails:
+                    if email and email not in exist_emails:
+                        # name字段不能为空，取@前前缀或全邮箱
+                        name = email.split('@')[0] if '@' in email else email
+                        logger.info(f'即将写入: name={name}, email={email}')
+                        emp = Employee(name=name, email=email)
+                        db.session.add(emp)
+                        exist_emails.add(email)  # 立即加入已存在集合，防止本次重复
+                try:
                     db.session.commit()
-                    flash('收信人已清空')
-                elif action == 'send_mail':
-                    import smtplib
-                    from email.mime.text import MIMEText
-                    from email.header import Header
-                    from email.utils import formataddr
-                    smtp_server = request.form.get('smtp_server','')
-                    smtp_port = int(request.form.get('smtp_port','25'))
-                    sender_email = request.form.get('sender_email','')
-                    sender_pass = request.form.get('sender_pass','')
-                    sender_name = request.form.get('sender_name','')
-                    mail_subject = request.form.get('mail_subject','')
-                    template_name = request.form.get('template_name','')
-                    with open(os.path.join(templates_dir, template_name), 'r', encoding='utf-8') as f:
-                        template_html = f.read()
-                    # 直接用数据库Employee表收信人
-                    employees = Employee.query.all()
-                    to_list = [e.email for e in employees if e.email]
-                    sent_count = 0
-                    for to_addr in to_list:
-                        try:
-                            msg = MIMEText(template_html, 'html', 'utf-8')
-                            msg['From'] = formataddr((str(sender_name or sender_email), sender_email))
-                            msg['To'] = to_addr
-                            msg['Subject'] = Header(mail_subject or '安全演练邮件', 'utf-8')
-                            if smtp_port == 465:
-                                s = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=10)
-                            else:
-                                s = smtplib.SMTP(smtp_server, smtp_port, timeout=10)
-                                if smtp_port == 587:
-                                    s.starttls()
-                            s.login(sender_email, sender_pass)
-                            s.sendmail(sender_email, [to_addr], msg.as_string())
-                            s.quit()
-                            sent_count += 1
-                        except Exception as e:
-                            send_result += f"发送到 {to_addr} 失败: {e}\n"
-                    send_result += f"成功发送 {sent_count} 封邮件。"
-                # (已移入 import_recipients 分支，其他分支不再引用 emails，避免 UnboundLocalError)
-            # 刷新收信人
+                    logger.info('db.session.commit()成功')
+                except Exception as e:
+                    logger.error(f'db.session.commit()异常: {e}')
+                flash('收信人已导入')
+            elif action == 'clear_recipients':
+                Employee.query.delete()
+                db.session.commit()
+                flash('收信人已清空')
+            elif action == 'send_mail':
+                import smtplib
+                from email.mime.text import MIMEText
+                from email.header import Header
+                from email.utils import formataddr
+                smtp_server = request.form.get('smtp_server','')
+                smtp_port = int(request.form.get('smtp_port','25'))
+                sender_email = request.form.get('sender_email','')
+                sender_pass = request.form.get('sender_pass','')
+                sender_name = request.form.get('sender_name','')
+                mail_subject = request.form.get('mail_subject','')
+                template_name = request.form.get('template_name','')
+                with open(os.path.join(templates_dir, template_name), 'r', encoding='utf-8') as f:
+                    template_html = f.read()
+                # 直接用数据库Employee表收信人
+                employees = Employee.query.all()
+                to_list = [e.email for e in employees if e.email]
+                sent_count = 0
+                for to_addr in to_list:
+                    try:
+                        msg = MIMEText(template_html, 'html', 'utf-8')
+                        msg['From'] = formataddr((str(sender_name or sender_email), sender_email))
+                        msg['To'] = to_addr
+                        msg['Subject'] = Header(mail_subject or '安全演练邮件', 'utf-8')
+                        if smtp_port == 465:
+                            s = smtplib.SMTP_SSL(smtp_server, smtp_port, timeout=10)
+                        else:
+                            s = smtplib.SMTP(smtp_server, smtp_port, timeout=10)
+                            if smtp_port == 587:
+                                s.starttls()
+                        s.login(sender_email, sender_pass)
+                        s.sendmail(sender_email, [to_addr], msg.as_string())
+                        s.quit()
+                        sent_count += 1
+                    except Exception as e:
+                        send_result += f"发送到 {to_addr} 失败: {e}\n"
+                send_result += f"成功发送 {sent_count} 封邮件。"
+            # (已移入 import_recipients 分支，其他分支不再引用 emails，避免 UnboundLocalError)
+        # 刷新收信人
             employees = Employee.query.order_by(Employee.id.desc()).all()
             recipients = '\n'.join([e.email for e in employees])
         if not template_html and template_name:

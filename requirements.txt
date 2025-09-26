@@ -1,7 +1,4 @@
-flask_sqlalchemy
-flask_mail
-werkzeug
-cryptography
+flask
 flask_sqlalchemy
 flask_mail
 werkzeug
