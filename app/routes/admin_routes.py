@@ -105,6 +105,7 @@ def create_admin_bp(url_prefix):
                             logger.info(f'即将写入: name={name}, email={email}')
                             emp = Employee(name=name, email=email)
                             db.session.add(emp)
+                            exist_emails.add(email)  # 立即加入已存在集合，防止本次重复
                     try:
                         db.session.commit()
                         logger.info('db.session.commit()成功')
