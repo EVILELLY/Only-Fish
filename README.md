@@ -1,18 +1,4 @@
-# 🎣 Onl## 📸 界面预览
-
-| 邮件管理 | 凭证管理 | 钓鱼页面 |
-|---------|---------|---------|
-| ![邮件管理](docs/images/email-manager.png) | ![凭证管理](docs/images/creds-manager.png) | ![钓鱼页面](docs/images/phishing-page.png) |
-
-##  项目简介
-
-OnlyFish 是一个现代化的钓鱼邮件演练平台，专为企业网络安全意识培训设计。采用紫色渐变UI，提供邮件发送、数据收集、结果分析的完整流程。
-
-## ✨ 核心功能
-
-- **📧 邮件管理**：多模板支持、实时预览、批量导入、SMTP配置
-- **🗂️ 凭证管理**：数据统计、智能筛选、批量操作、CSV导出  
-- **🎨 现代界面**：响应式设计、卡片布局、用户友好鱼邮件演练平台
+# 🎣 OnlyFish - 钓鱼邮件演练平台
 
 ![Python](https://img.shields.io/badge/Python-3.7+-blue?style=flat&logo=python)
 ![Flask](https://img.shields.io/badge/Flask-Web框架-green?style=flat)
@@ -20,7 +6,13 @@ OnlyFish 是一个现代化的钓鱼邮件演练平台，专为企业网络安�
 
 > 一个专业的钓鱼邮件演练平台，用于企业安全意识培训
 
-##  项目简介
+## 📸 界面预览
+
+| 邮件管理 | 凭证管理 | 钓鱼页面 |
+|---------|---------|---------|
+| ![邮件管理](docs/images/email-manager.png) | ![凭证管理](docs/images/creds-manager.png) | ![钓鱼页面](docs/images/phishing-page.png) |
+
+## 📋 项目简介
 
 OnlyFish 是一个现代化的钓鱼邮件演练平台，专为企业网络安全意识培训设计。采用紫色渐变UI，提供邮件发送、数据收集、结果分析的完整流程。
 
@@ -28,7 +20,7 @@ OnlyFish 是一个现代化的钓鱼邮件演练平台，专为企业网络安�
 
 - **📧 邮件管理**：多模板支持、实时预览、批量导入、SMTP配置
 - **🗂️ 凭证管理**：数据统计、智能筛选、批量操作、CSV导出  
-- **� 现代界面**：响应式设计、卡片布局、用户友好
+- **🎨 现代界面**：响应式设计、卡片布局、用户友好
 
 ## 🚀 快速开始
 
@@ -45,12 +37,6 @@ python run.py --port 8080
 
 # 4. 访问管理页面（终端会显示具体链接）
 ```
-
-## 📸 界面预览
-
-| 邮件管理 | 凭证管理 | 钓鱼页面 |
-|---------|---------|---------|
-| ![邮件管理](docs/images/email-manager.png) | ![凭证管理](docs/images/creds-manager.png) | ![钓鱼页面](docs/images/phishing-page.png) |
 
 ## ⚙️ 配置说明
 
