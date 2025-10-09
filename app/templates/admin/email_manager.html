@@ -249,11 +249,36 @@
         padding: 16px;
       }
     }
+    
+    .page-header {
+      text-align: center;
+      color: white;
+      margin-bottom: 40px;
+      padding: 20px 0;
+    }
+    
+    .page-header h1 {
+      font-size: 36px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .page-header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
+    <!-- 页面标题 -->
+    <div class="page-header">
+      <h1>📧 邮件管理系统</h1>
+      <p>配置和发送钓鱼邮件演练</p>
+    </div>
+    
     <form method="post" enctype="multipart/form-data">
       
       <!-- 发件配置 -->
